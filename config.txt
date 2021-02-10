@@ -1,0 +1,4 @@
+
+A_server|D:\XMLCompare\XML\Wafer\A
+
+B_server|D:\XMLCompare\XML\Wafer\B
