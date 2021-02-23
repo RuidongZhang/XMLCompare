@@ -58,6 +58,7 @@ def strList(result_str):
 
     return strDf(result_list, flag_5col)
 
+
 # list to Dataframe
 def strDf(lis, flag_5col=False):
     columns = ['Type', 'Position', 'Property', 'Value']
@@ -71,11 +72,33 @@ def strDf(lis, flag_5col=False):
     return df_each_file
 
 
+def source_file_get(file_path):
+
+    os.rename(file_path, file_path.replace('xml', 'txt'))
+
+    fopen = open(file_path.replace('xml', 'txt'), 'r', encoding='utf-8')
+
+    # blank list without seek
+    fopen.seek(0, 0)
+    lines = fopen.readlines()
+
+    for row in lines:
+        if 'FileName=' in row:
+            tmp = row.split('FileName=')[1]
+            tmp = tmp.split('"')[1]
+            fopen.close()
+            os.rename(file_path.replace('xml', 'txt'), file_path)
+
+            return tmp
+
+
 def main_work():
     A_server_path, B_server_path = readConfig()
 
     list_A = readFolder(A_server_path)
     list_B = readFolder(B_server_path)
+    list_A.sort()
+    list_B.sort()
     each_file_A = ''
     each_file_B = ''
 
@@ -88,41 +111,66 @@ def main_work():
             if '.xml' in each_file_A:
                 tmp = each_file_A.split('_')
                 lot = tmp[0]
+
                 sort = tmp[1]
+                if len(tmp) == 5:
+                    sort += '_' + tmp[2]
                 file_start = lot + '_' + sort
                 each_file_A = A_server_path.replace('\n', '') + '\\' + each_file_A
-            # if len([each for each in list_B if each.startswith(file_start)]) == 1:
 
-            tmp = [each for each in list_B if each.startswith(file_start)]
-            if len(tmp) == 1:
-                each_file_B = tmp[0]
-                each_file_B = B_server_path.replace('\n', '') + '\\' + each_file_B
+                # same lot and sort but multiple files
+                tmp_A = [each for each in list_A if each.startswith(file_start)]
+                tmp_B = [each for each in list_B if each.startswith(file_start)]
 
-            # B to A
-            out_AB = compare_xmls(each_file_A, each_file_B)
-            df_AB = strList(out_AB)
-
-            # A to B
-            out_BA = compare_xmls(each_file_B, each_file_A)
-            df_BA = strList(out_BA)
-
-            df_each_file = pandas.merge(left=df_BA, right=df_AB, on=['Position', 'Property'],
-                                        suffixes=('_A', '_B'))
-
-            # if ('Backup' in df_BA.columns) and ('Backup' in df_AB.columns):
-            #     columns += ['Backup_A', 'Backup_B']
-            # elif ('Backup' in df_BA.columns) and ('Backup' not in df_AB.columns):
-            #     columns += ['Backup']
-            # elif ('Backup' not in df_BA.columns) and ('Backup' in df_AB.columns):
-            #     columns += ['Backup']
+                # position_A = tmp_A.index(each_file_A)
+                source_file_name_A=''
+                source_file_name_B=''
+                if len(tmp_A) > 1 or len(tmp_B) > 1:
+                    source_file_name_A = source_file_get(each_file_A)
 
 
-            df_each_file = df_each_file[columns]
+                if len(tmp_B) == 1:
+                    each_file_B = tmp_B[0]
+                    each_file_B = B_server_path.replace('\n', '') + '\\' + each_file_B
+                    if len(tmp_A) >1:
+                        source_file_name_B = source_file_get(each_file_B)
 
-            df_each_file.rename(columns={'Type_A': 'Type'}, inplace=True)
-            df_each_file.insert(0, 'lot_sort', file_start)
+                if len(tmp_B) > 1:
+                    for each_file_B in tmp_B:
+                        each_file_B = B_server_path.replace('\n', '') + '\\' + each_file_B
+                        source_file_name_B = source_file_get(each_file_B)
+                        if source_file_name_A == source_file_name_B:
+                            break
 
-            df_result = pandas.concat([df_result, df_each_file])
+                if source_file_name_A != source_file_name_B:
+                    error += [file_start]
+                    continue
+
+
+                # B to A
+                out_AB = compare_xmls(each_file_A, each_file_B)
+                df_AB = strList(out_AB)
+
+                # A to B
+                out_BA = compare_xmls(each_file_B, each_file_A)
+                df_BA = strList(out_BA)
+
+                df_each_file = pandas.merge(left=df_BA, right=df_AB, on=['Position', 'Property'],
+                                            suffixes=('_A', '_B'))
+
+                # if ('Backup' in df_BA.columns) and ('Backup' in df_AB.columns):
+                #     columns += ['Backup_A', 'Backup_B']
+                # elif ('Backup' in df_BA.columns) and ('Backup' not in df_AB.columns):
+                #     columns += ['Backup']
+                # elif ('Backup' not in df_BA.columns) and ('Backup' in df_AB.columns):
+                #     columns += ['Backup']
+
+                df_each_file = df_each_file[columns]
+
+                df_each_file.rename(columns={'Type_A': 'Type'}, inplace=True)
+                df_each_file.insert(0, 'lot_sort', file_start)
+
+                df_result = pandas.concat([df_result, df_each_file])
 
         except:
             error += [file_start]
