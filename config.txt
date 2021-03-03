@@ -1,4 +1,8 @@
 
-A_server|D:\XMLCompare\XML\Wafer\A
+# A_server|D:\XMLCompare\XML\Result\FT\A_19Feb to 1Mar
+#
+# B_server|D:\XMLCompare\XML\Result\FT\B_19Feb to 1Mar
 
-B_server|D:\XMLCompare\XML\Wafer\B
+A_server|D:\XMLCompare\XML\A
+
+B_server|D:\XMLCompare\XML\B
