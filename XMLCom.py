@@ -26,7 +26,27 @@ def readConfig():
 
 def compare_xmls(observed, expected):
     formatter = formatting.DiffFormatter()
-    diff = main.diff_files(observed, expected, formatter=formatter)
+    # diff_options: A dictionary containing options that will be passed into the Differ(): F: A value between 0 and 1
+    # that determines how similar two XML nodes must be to match as the same in both trees. Defaults to 0.5.
+    #
+    # A higher value requires a smaller difference between two nodes for them to match. Set the value high,
+    # and you will see more nodes inserted and deleted instead of being updated. Set the value low, and you will get
+    # more updates instead of inserts and deletes.
+    #
+    # uniqueattrs: A list of XML node attributes that will uniquely identify a node. See Unique Attributes for more
+    # info.
+    #
+    # Defaults to ['{http://www.w3.org/XML/1998/namespace}id'].
+    #
+    # ratio_mode:
+    #
+    # The ratio_mode determines how accurately the similarity between two nodes is calculated. The choices are
+    # 'accurate', 'fast' and 'faster'. Defaults to 'fast'.
+    #
+    # Using 'faster' often results in less optimal edits scripts, in other words, you will have more actions to
+    # achieve the same result. Using 'accurate' will be significantly slower, especially if your nodes have long
+    # texts or many attributes.
+    diff = main.diff_files(observed, expected,diff_options={'F': 0.5, 'ratio_mode': 'accurate'}, formatter=formatter)
     return diff
 
 
@@ -118,7 +138,7 @@ def main_work():
     df_result = pandas.DataFrame()
     error = []
     for each_file_A in list_A:
-        columns = ['Type_A', 'Position', 'Property', 'Value_A', 'Value_B', 'Backup_A', 'Backup_B']
+        columns = ['Type_B', 'Position', 'Property', 'Value_A', 'Value_B', 'Backup_A', 'Backup_B']
 
         try:
             file_type = get_type(each_file_A)
@@ -179,7 +199,7 @@ def main_work():
                     os.rename(each_file_B, each_file_B.replace('xml', file_type))
 
                 df_each_file = pandas.merge(left=df_BA, right=df_AB, on=['Position', 'Property'],
-                                            suffixes=('_A', '_B'))
+                                            suffixes=('_A', '_B'),how='left')
 
                 # if ('Backup' in df_BA.columns) and ('Backup' in df_AB.columns):
                 #     columns += ['Backup_A', 'Backup_B']
@@ -190,7 +210,7 @@ def main_work():
 
                 df_each_file = df_each_file[columns]
 
-                df_each_file.rename(columns={'Type_A': 'Type'}, inplace=True)
+                df_each_file.rename(columns={'Type_B': 'Type'}, inplace=True)
                 df_each_file.insert(0, 'lot_sort', file_start)
                 if source_file_name_A:
                     df_each_file['Backup_A'] = source_file_name_A
@@ -205,17 +225,17 @@ def main_work():
 
             continue
 
-    now = time.strftime("%Y-%m-%d %H-%M-%S", time.localtime(time.time()))  # 当前日期
+    now = time.strftime("%Y-%m-%d %H-%M-%S", time.localtime(time.time()))  # Time now
     report_name = 'Result - ' + now + '.csv'
 
     df_result = df_result.reset_index(drop=True)
-    df_result.to_csv(report_name, index=0)
+    df_result.to_csv(report_name, index=False)
     df_error = pandas.DataFrame(error)
 
     if error:
         report_name = 'Error - ' + now + '.csv'
 
-        df_error.to_csv(report_name, index=0)
+        df_error.to_csv(report_name, index=False)
 
     pass
     pass
