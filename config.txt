@@ -1,8 +1,16 @@
 
-# A_server|D:\XMLCompare\XML\Result\FT\A_19Feb to 1Mar
+# A_server log path
 #
-# B_server|D:\XMLCompare\XML\Result\FT\B_19Feb to 1Mar
+# B_server log path
+#
+# Output path :result and error folder
+#
+# Support file type : xml
+#
+# DON'T open any file during process!
 
 A_server|D:\XMLCompare\XML\A
 
 B_server|D:\XMLCompare\XML\B
+
+Output|D:\XMLCompare\XML\B

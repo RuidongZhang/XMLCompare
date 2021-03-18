@@ -1,6 +1,5 @@
 from xmldiff import main, formatting
 import os
-import shutil
 import time
 import sys
 import pandas
@@ -18,14 +17,18 @@ def readConfig():
             A_server_path = row.split('|')[1]
         if row.startswith('B_server'):
             B_server_path = row.split('|')[1]
+        if row.startswith('Output'):
+            output_path = row.split('|')[1]
 
     fopen.close()
 
-    return A_server_path, B_server_path
+    return A_server_path, B_server_path, output_path
 
 
 def compare_xmls(observed, expected):
     formatter = formatting.DiffFormatter()
+    # FYI: https://xmldiff.readthedocs.io/en/stable
+    #
     # diff_options: A dictionary containing options that will be passed into the Differ(): F: A value between 0 and 1
     # that determines how similar two XML nodes must be to match as the same in both trees. Defaults to 0.5.
     #
@@ -46,7 +49,7 @@ def compare_xmls(observed, expected):
     # Using 'faster' often results in less optimal edits scripts, in other words, you will have more actions to
     # achieve the same result. Using 'accurate' will be significantly slower, especially if your nodes have long
     # texts or many attributes.
-    diff = main.diff_files(observed, expected,diff_options={'F': 0.5, 'ratio_mode': 'accurate'}, formatter=formatter)
+    diff = main.diff_files(observed, expected,diff_options={'F': 0.5, 'ratio_mode': 'accurate','uniqueattrs':[('RuleEvaluation','Name')]}, formatter=formatter)
     return diff
 
 
@@ -126,7 +129,7 @@ def get_type(file_path):
 
 
 def main_work():
-    A_server_path, B_server_path = readConfig()
+    A_server_path, B_server_path, output_path = readConfig()
 
     list_A = readFolder(A_server_path)
     list_B = readFolder(B_server_path)
@@ -199,7 +202,7 @@ def main_work():
                     os.rename(each_file_B, each_file_B.replace('xml', file_type))
 
                 df_each_file = pandas.merge(left=df_BA, right=df_AB, on=['Position', 'Property'],
-                                            suffixes=('_A', '_B'),how='left')
+                                            suffixes=('_A', '_B'),how='right')
 
                 # if ('Backup' in df_BA.columns) and ('Backup' in df_AB.columns):
                 #     columns += ['Backup_A', 'Backup_B']
@@ -219,21 +222,22 @@ def main_work():
 
 
 
-        except:
+        except Exception as e:
+            print(e, 'Error: %s' % file_start)
             error += [file_start]
             # error += [each_file_A.split('\\')[-1]]
 
             continue
 
     now = time.strftime("%Y-%m-%d %H-%M-%S", time.localtime(time.time()))  # Time now
-    report_name = 'Result - ' + now + '.csv'
+    report_name = output_path + '\\' + 'Result - ' + now + '.csv'
 
     df_result = df_result.reset_index(drop=True)
     df_result.to_csv(report_name, index=False)
     df_error = pandas.DataFrame(error)
 
     if error:
-        report_name = 'Error - ' + now + '.csv'
+        report_name = output_path + '\\' +  'Error - ' + now + '.csv'
 
         df_error.to_csv(report_name, index=False)
 
@@ -241,4 +245,32 @@ def main_work():
     pass
 
 
-main_work()
+try:
+    main_work()
+except Exception as e:
+    print(e, 'Error:main')
+
+print('finish')
+
+
+
+from threading import Thread
+
+input_str = 0
+
+def wait_input():
+    global input_str
+
+    input_str = input('Input any key and press "Enter" to prevent being closed.')
+    print('You need close the window manually.')
+
+thd = Thread(target=wait_input)
+thd.daemon = True
+thd.start()
+
+seconds = 10
+time.sleep(seconds)
+
+if input_str:
+    while 1:
+        time.sleep(10)
