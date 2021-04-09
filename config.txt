@@ -5,6 +5,11 @@
 #
 # Output path :result and error folder
 #
+# Start time: file created after this time in A server would be compared. FYI: 2019-01-01
+# End time: file created before this time in A server would be compared. FYI: 2021-01-01. If could also type now instead
+#
+
+
 # Support file type : xml
 #
 # DON'T open any file during process!
@@ -14,3 +19,8 @@ A_server|D:\XMLCompare\XML\A
 B_server|D:\XMLCompare\XML\B
 
 Output|D:\XMLCompare\XML\B
+
+Start_time|2021-04-01
+
+# End_time|2021-01-01
+End_time|now

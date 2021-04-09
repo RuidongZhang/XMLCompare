@@ -18,11 +18,22 @@ def readConfig():
         if row.startswith('B_server'):
             B_server_path = row.split('|')[1]
         if row.startswith('Output'):
-            output_path = row.split('|')[1]
+            output_path = row.split('|')[1].rstrip('\n')
+        if row.startswith('Start_time'):
+            start_time = row.split('|')[1].rstrip('\n')
+            start_time = time.mktime(time.strptime(start_time, "%Y-%m-%d"))
+            start_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(start_time))
+        if row.startswith('End_time'):
+            end_time = row.split('|')[1].rstrip('\n')
+            if 'now' in end_time:
+                end_time = 'now'
+            else:
+                end_time = time.mktime(time.strptime(end_time, "%Y-%m-%d %H:%M:%S"))
+                end_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(end_time))
 
     fopen.close()
 
-    return A_server_path, B_server_path, output_path
+    return A_server_path, B_server_path, output_path, start_time, end_time
 
 
 def compare_xmls(observed, expected):
@@ -129,7 +140,7 @@ def get_type(file_path):
 
 
 def main_work():
-    A_server_path, B_server_path, output_path = readConfig()
+    A_server_path, B_server_path, output_path, start_time, end_time = readConfig()
 
     list_A = readFolder(A_server_path)
     list_B = readFolder(B_server_path)
@@ -155,6 +166,17 @@ def main_work():
                     sort += '_' + tmp[2]
                 file_start = lot + '_' + sort
                 each_file_A = A_server_path.replace('\n', '') + '\\' + each_file_A
+
+                # skip file out of (start,end)
+                create_time = os.path.getmtime(each_file_A)
+                create_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(create_time))
+                if create_time < start_time:
+                    continue
+                if end_time != 'now':
+                    if create_time > end_time:
+                        continue
+
+
 
                 # same lot and sort but multiple files
                 tmp_A = [each for each in list_A if each.startswith(file_start)]
