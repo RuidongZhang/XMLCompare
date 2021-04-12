@@ -13,14 +13,25 @@
 # Support file type : xml
 #
 # DON'T open any file during process!
+#
+# A_server|D:\XMLCompare\XML\A
+#
+# B_server|D:\XMLCompare\XML\B
+#
+# Output|D:\XMLCompare\XML\B
+#
+# Start_time|2021-04-01
+#
+# # End_time|2021-01-01
+# End_time|now
 
-A_server|D:\XMLCompare\XML\A
+A_server|\\nardc02nasp201.wbi.nxp.com\USPHX01OPLOADER-FS01\OptimalTestFiles\SequoiaWidgets\Ruidong\XML\FT\A_19Feb to 1Mar
 
-B_server|D:\XMLCompare\XML\B
+B_server|\\nardc02nasp201.wbi.nxp.com\USPHX01OPLOADER-FS01\OptimalTestFiles\SequoiaWidgets\Ruidong\XML\FT\B_19Feb to 1Mar
 
 Output|D:\XMLCompare\XML\B
 
-Start_time|2021-04-01
+Start_time|2021-03-01
 
 # End_time|2021-01-01
-End_time|now
+End_time|2021-03-03

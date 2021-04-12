@@ -28,7 +28,7 @@ def readConfig():
             if 'now' in end_time:
                 end_time = 'now'
             else:
-                end_time = time.mktime(time.strptime(end_time, "%Y-%m-%d %H:%M:%S"))
+                end_time = time.mktime(time.strptime(end_time, "%Y-%m-%d"))
                 end_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(end_time))
 
     fopen.close()
@@ -60,7 +60,9 @@ def compare_xmls(observed, expected):
     # Using 'faster' often results in less optimal edits scripts, in other words, you will have more actions to
     # achieve the same result. Using 'accurate' will be significantly slower, especially if your nodes have long
     # texts or many attributes.
-    diff = main.diff_files(observed, expected,diff_options={'F': 0.5, 'ratio_mode': 'accurate','uniqueattrs':[('RuleEvaluation','Name')]}, formatter=formatter)
+    diff = main.diff_files(observed, expected, diff_options={'F': 0.5, 'ratio_mode': 'accurate',
+                                                             'uniqueattrs': [('RuleEvaluation', 'Name')]},
+                           formatter=formatter)
     return diff
 
 
@@ -154,6 +156,9 @@ def main_work():
     for each_file_A in list_A:
         columns = ['Type_B', 'Position', 'Property', 'Value_A', 'Value_B', 'Backup_A', 'Backup_B']
 
+        # reference before assigned
+        file_start = each_file_A[0:]
+
         try:
             file_type = get_type(each_file_A)
 
@@ -171,12 +176,12 @@ def main_work():
                 create_time = os.path.getmtime(each_file_A)
                 create_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(create_time))
                 if create_time < start_time:
+                    print(file_start, 'skip by time')
                     continue
                 if end_time != 'now':
                     if create_time > end_time:
+                        print(file_start, 'skip by time')
                         continue
-
-
 
                 # same lot and sort but multiple files
                 tmp_A = [each for each in list_A if each.startswith(file_start)]
@@ -224,7 +229,7 @@ def main_work():
                     os.rename(each_file_B, each_file_B.replace('xml', file_type))
 
                 df_each_file = pandas.merge(left=df_BA, right=df_AB, on=['Position', 'Property'],
-                                            suffixes=('_A', '_B'),how='right')
+                                            suffixes=('_A', '_B'), how='right')
 
                 # if ('Backup' in df_BA.columns) and ('Backup' in df_AB.columns):
                 #     columns += ['Backup_A', 'Backup_B']
@@ -259,7 +264,7 @@ def main_work():
     df_error = pandas.DataFrame(error)
 
     if error:
-        report_name = output_path + '\\' +  'Error - ' + now + '.csv'
+        report_name = output_path + '\\' + 'Error - ' + now + '.csv'
 
         df_error.to_csv(report_name, index=False)
 
@@ -274,17 +279,17 @@ except Exception as e:
 
 print('finish')
 
-
-
 from threading import Thread
 
 input_str = 0
+
 
 def wait_input():
     global input_str
 
     input_str = input('Input any key and press "Enter" to prevent being closed.')
     print('You need close the window manually.')
+
 
 thd = Thread(target=wait_input)
 thd.daemon = True
