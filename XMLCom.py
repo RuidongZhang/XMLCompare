@@ -111,9 +111,9 @@ def strDf(lis, flag_5col=False):
 def source_file_get(file_path):
     file_type = get_type(file_path)
 
-    os.rename(file_path, file_path.replace(file_type, 'txt'))
+    # os.rename(file_path, file_path.replace(file_type, 'txt'))
 
-    fopen = open(file_path.replace(file_type, 'txt'), 'r', encoding='utf-8')
+    fopen = open(file_path, 'r', encoding='utf-8')
 
     # blank list without seek
     fopen.seek(0, 0)
@@ -125,10 +125,11 @@ def source_file_get(file_path):
             tmp = tmp.split('"')[1]
             tmp = ''.join(tmp.split('.')[0:-1])
             fopen.close()
-            os.rename(file_path.replace(file_type, 'txt'), file_path)
+            # os.rename(file_path.replace(file_type, 'txt'), file_path)
 
             return tmp
 
+    return ''
 
 def get_type(file_path):
     if '.xml' in file_path:
@@ -140,6 +141,13 @@ def get_type(file_path):
 
     return file_type
 
+def copyfile(src_file,dst_dir,file_type):
+    import shutil
+
+    dst = dst_dir.rstrip('\n') + '\\' + src_file.split('\\')[-1].replace(file_type,'xml')
+    shutil.copyfile(src_file, dst)
+
+    return dst
 
 def main_work():
     A_server_path, B_server_path, output_path, start_time, end_time = readConfig()
@@ -157,7 +165,7 @@ def main_work():
         columns = ['Type_B', 'Position', 'Property', 'Value_A', 'Value_B', 'Backup_A', 'Backup_B']
 
         # reference before assigned
-        file_start = each_file_A[0:]
+        file_start = each_file_A
 
         try:
             file_type = get_type(each_file_A)
@@ -184,37 +192,46 @@ def main_work():
                         continue
 
                 # same lot and sort but multiple files
-                tmp_A = [each for each in list_A if each.startswith(file_start)]
+                # tmp_A = [each for each in list_A if each.startswith(file_start)]
                 tmp_B = [each for each in list_B if each.startswith(file_start)]
 
-                # position_A = tmp_A.index(each_file_A)
-                source_file_name_A = ''
+                # # position_A = tmp_A.index(each_file_A)
+                # source_file_name_A = ''
+                # if len(tmp_A) > 1 or len(tmp_B) > 1:
+                source_file_name_A = source_file_get(each_file_A)
+                if file_type not in ['xml','XML']:
+                    source_file_name_A = '  '
+
                 source_file_name_B = ''
-                if len(tmp_A) > 1 or len(tmp_B) > 1:
-                    source_file_name_A = source_file_get(each_file_A)
-
-                if len(tmp_B) == 1:
-                    each_file_B = tmp_B[0]
+                #
+                # if len(tmp_B) == 1:
+                #     each_file_B = tmp_B[0]
+                #     each_file_B = B_server_path.replace('\n', '') + '\\' + each_file_B
+                #     if len(tmp_A) > 1:
+                #         source_file_name_B = source_file_get(each_file_B)
+                #
+                # if len(tmp_B) > 1:
+                for each_file_B in tmp_B:
                     each_file_B = B_server_path.replace('\n', '') + '\\' + each_file_B
-                    if len(tmp_A) > 1:
-                        source_file_name_B = source_file_get(each_file_B)
-
-                if len(tmp_B) > 1:
-                    for each_file_B in tmp_B:
-                        each_file_B = B_server_path.replace('\n', '') + '\\' + each_file_B
-                        source_file_name_B = source_file_get(each_file_B)
-                        if source_file_name_A == source_file_name_B:
-                            break
+                    source_file_name_B = source_file_get(each_file_B)
+                    if source_file_name_A == source_file_name_B:
+                        break
 
                 if source_file_name_A != source_file_name_B:
                     error += [file_start]
                     continue
 
                 if file_type != 'xml':
-                    os.rename(each_file_A, each_file_A.replace(file_type, 'xml'))
-                    os.rename(each_file_B, each_file_B.replace(file_type, 'xml'))
-                    each_file_A = each_file_A.replace(file_type, 'xml')
-                    each_file_B = each_file_B.replace(file_type, 'xml')
+                    each_file_A=copyfile(each_file_A,output_path,file_type)
+                    each_file_B=copyfile(each_file_B,output_path,file_type)
+
+                #     shutil.copyfile(each_file_A, each_file_A.replace(file_type, 'xml'))
+                #     shutil.copyfile(each_file_B, each_file_B.replace(file_type, 'xml'))
+
+                #     os.rename(each_file_A, each_file_A.replace(file_type, 'xml'))
+                #     os.rename(each_file_B, each_file_B.replace(file_type, 'xml'))
+                #     each_file_A = each_file_A.replace(file_type, 'xml')
+                #     each_file_B = each_file_B.replace(file_type, 'xml')
 
                 # B to A
                 out_AB = compare_xmls(each_file_A, each_file_B)
@@ -225,8 +242,13 @@ def main_work():
                 df_BA = strList(out_BA)
 
                 if file_type != 'xml':
-                    os.rename(each_file_A, each_file_A.replace('xml', file_type))
-                    os.rename(each_file_B, each_file_B.replace('xml', file_type))
+                    os.remove(each_file_A)
+                    os.remove(each_file_B)
+                #
+                #
+                #
+                #     os.rename(each_file_A, each_file_A.replace('xml', file_type))
+                #     os.rename(each_file_B, each_file_B.replace('xml', file_type))
 
                 df_each_file = pandas.merge(left=df_BA, right=df_AB, on=['Position', 'Property'],
                                             suffixes=('_A', '_B'), how='right')

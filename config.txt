@@ -25,13 +25,13 @@
 # # End_time|2021-01-01
 # End_time|now
 
-A_server|\\nardc02nasp201.wbi.nxp.com\USPHX01OPLOADER-FS01\OptimalTestFiles\SequoiaWidgets\Ruidong\XML\FT\A_19Feb to 1Mar
+A_server|\\nardc02nasp201.wbi.nxp.com\USPHX01OPLOADER-FS01\OptimalTestFiles\SequoiaWidgets\Ruidong\XML\MAP\A_MAP
 
-B_server|\\nardc02nasp201.wbi.nxp.com\USPHX01OPLOADER-FS01\OptimalTestFiles\SequoiaWidgets\Ruidong\XML\FT\B_19Feb to 1Mar
+B_server|\\nardc02nasp201.wbi.nxp.com\USPHX01OPLOADER-FS01\OptimalTestFiles\SequoiaWidgets\Ruidong\XML\MAP\B_MAP
 
-Output|D:\XMLCompare\XML\B
+Output|E:\XMLCompare\FT\B
 
-Start_time|2021-03-01
+Start_time|2020-01-12
 
 # End_time|2021-01-01
-End_time|2021-03-03
+End_time|now
