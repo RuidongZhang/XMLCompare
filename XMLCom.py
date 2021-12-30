@@ -29,15 +29,15 @@ def readConfig():
                 end_time = 'now'
             else:
                 end_time = time.mktime(time.strptime(end_time, "%Y-%m-%d"))
-                end_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(end_time))
+                end_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(end_time + 24 * 3600))
 
     fopen.close()
 
     return A_server_path, B_server_path, output_path, start_time, end_time
 
 
-def compare_xmls(observed, expected):
-    formatter = formatting.DiffFormatter()
+def compare_xmls(observed, expected, file_type='xml'):
+    formatter = formatting.XMLFormatter()
     # FYI: https://xmldiff.readthedocs.io/en/stable
     #
     # diff_options: A dictionary containing options that will be passed into the Differ(): F: A value between 0 and 1
@@ -60,9 +60,21 @@ def compare_xmls(observed, expected):
     # Using 'faster' often results in less optimal edits scripts, in other words, you will have more actions to
     # achieve the same result. Using 'accurate' will be significantly slower, especially if your nodes have long
     # texts or many attributes.
-    diff = main.diff_files(observed, expected, diff_options={'F': 0.5, 'ratio_mode': 'accurate',
-                                                             'uniqueattrs': [('RuleEvaluation', 'Name')]},
-                           formatter=formatter)
+    if file_type == 'xml':
+        uniqueattrs = [('RuleEvaluation', 'Name')]
+    else:
+        uniqueattrs = [('RuleEvaluation', 'Name')]
+    # observed=observed.replace('xml','html')
+    # expected=expected.replace('xml','html')
+    diff = main.diff_files(observed, expected,
+                           diff_options={'fast_match': True, 'F': 0.5, 'ratio_mode': 'fast',
+                                         'uniqueattrs': [('RuleEvaluation', 'Index')]},
+                           formatter=formatting.DiffFormatter())
+
+    # diff = main.diff_files(observed, expected,
+    #
+    #                        formatter=formatting.XMLFormatter())
+
     return diff
 
 
@@ -131,6 +143,7 @@ def source_file_get(file_path):
 
     return ''
 
+
 def get_type(file_path):
     if '.xml' in file_path:
         file_type = 'xml'
@@ -141,13 +154,15 @@ def get_type(file_path):
 
     return file_type
 
-def copyfile(src_file,dst_dir,file_type):
+
+def copyfile(src_file, dst_dir, file_type):
     import shutil
 
-    dst = dst_dir.rstrip('\n') + '\\' + src_file.split('\\')[-1].replace(file_type,'xml')
+    dst = dst_dir.rstrip('\n') + '\\' + src_file.split('\\')[-1].replace(file_type, 'xml')
     shutil.copyfile(src_file, dst)
 
     return dst
+
 
 def main_work():
     A_server_path, B_server_path, output_path, start_time, end_time = readConfig()
@@ -161,7 +176,11 @@ def main_work():
 
     df_result = pandas.DataFrame()
     error = []
+    i = 0
     for each_file_A in list_A:
+        i += 1
+        print('Processing file %d:' % i + each_file_A)
+        each_file_B = ''
         columns = ['Type_B', 'Position', 'Property', 'Value_A', 'Value_B', 'Backup_A', 'Backup_B']
 
         # reference before assigned
@@ -184,11 +203,11 @@ def main_work():
                 create_time = os.path.getmtime(each_file_A)
                 create_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(create_time))
                 if create_time < start_time:
-                    print(file_start, 'skip by time')
+                    print(each_file_A, 'skip by time')
                     continue
                 if end_time != 'now':
                     if create_time > end_time:
-                        print(file_start, 'skip by time')
+                        print(each_file_A, 'skip by time')
                         continue
 
                 # same lot and sort but multiple files
@@ -198,9 +217,12 @@ def main_work():
                 # # position_A = tmp_A.index(each_file_A)
                 # source_file_name_A = ''
                 # if len(tmp_A) > 1 or len(tmp_B) > 1:
-                source_file_name_A = source_file_get(each_file_A)
-                if file_type not in ['xml','XML']:
-                    source_file_name_A = '  '
+                if file_type in ['xml', 'XML']:
+                    source_file_name_A = source_file_get(each_file_A)
+                else:
+                    source_file_name_A = ''
+                # if file_type not in ['xml','XML']:
+                #     source_file_name_A = '  '
 
                 source_file_name_B = ''
                 #
@@ -213,17 +235,23 @@ def main_work():
                 # if len(tmp_B) > 1:
                 for each_file_B in tmp_B:
                     each_file_B = B_server_path.replace('\n', '') + '\\' + each_file_B
-                    source_file_name_B = source_file_get(each_file_B)
+                    if file_type in ['xml', 'XML']:
+                        source_file_name_B = source_file_get(each_file_B)
+
                     if source_file_name_A == source_file_name_B:
                         break
 
                 if source_file_name_A != source_file_name_B:
-                    error += [file_start]
+                    error += [each_file_A]
+                    continue
+
+                if each_file_B == '':
+                    error += [each_file_A]
                     continue
 
                 if file_type != 'xml':
-                    each_file_A=copyfile(each_file_A,output_path,file_type)
-                    each_file_B=copyfile(each_file_B,output_path,file_type)
+                    each_file_A = copyfile(each_file_A, output_path, file_type)
+                    each_file_B = copyfile(each_file_B, output_path, file_type)
 
                 #     shutil.copyfile(each_file_A, each_file_A.replace(file_type, 'xml'))
                 #     shutil.copyfile(each_file_B, each_file_B.replace(file_type, 'xml'))
@@ -272,8 +300,9 @@ def main_work():
 
 
         except Exception as e:
-            print(e, 'Error: %s' % file_start)
-            error += [file_start]
+            print(e, 'Error: %s' % each_file_A)
+            if each_file_A:
+                error += [each_file_A]
             # error += [each_file_A.split('\\')[-1]]
 
             continue
