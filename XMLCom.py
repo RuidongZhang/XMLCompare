@@ -3,8 +3,22 @@ import os
 import time
 import sys
 import pandas
-
+import re
 path = os.path.dirname(os.path.realpath(sys.argv[0]))
+
+import xml.etree.ElementTree as ET
+
+def get_xml_root(file):
+    try:
+        tree = ET.parse(file)  # 打开xml文档
+        # root = ET.fromstring(country_string) #从字符串传递xml
+        root = tree.getroot()  # 获得root节点
+    except Exception as e:
+        print("Error:cannot parse file:%s"%file +str(e))
+        root = ''
+        # sys.exit(1)
+    return root
+
 
 
 def readConfig():
@@ -35,6 +49,31 @@ def readConfig():
 
     return A_server_path, B_server_path, output_path, start_time, end_time
 
+def get_data(file):
+    f = open(file,'r',encoding='utf-8')
+    data = f.readlines()
+    content = ''
+    i=0
+    for each in data:
+        i+=1
+        # if '<RuleEvaluation' in each:
+        #     each = each.replace('/>','>%s</RuleEvaluation>'%i)
+        # elif '<Software' in each:
+        #     each = each.replace('/>','>%s</Software>'%i)
+        # elif '<RequestReference' in each:
+        #     each = each.replace('/>','>%s</RequestReference>'%i)
+        # elif '<Run ' in each:
+        #     each = each.replace('/>','>%s</Run>'%i)
+        if '<Runs />' in each:
+            each = each.replace('<Runs />','<Runs>') + each.replace('<Runs />','</Runs>')
+        elif '<RulesStatus />' in each:
+
+            each = each.replace('<RulesStatus />','<RulesStatus>') + each.replace('<RulesStatus />','</RulesStatus>')
+
+        content+=each
+
+
+    return content
 
 def compare_xmls(observed, expected, file_type='xml'):
     formatter = formatting.XMLFormatter()
@@ -64,9 +103,9 @@ def compare_xmls(observed, expected, file_type='xml'):
         uniqueattrs = [('RuleEvaluation', 'Name')]
     else:
         uniqueattrs = [('RuleEvaluation', 'Name')]
-    # observed=observed.replace('xml','html')
-    # expected=expected.replace('xml','html')
-    diff = main.diff_files(observed, expected,
+    observed = get_data(observed)
+    expected = get_data(expected)
+    diff = main.diff_texts(observed, expected,
                            diff_options={'fast_match': True, 'F': 0.5, 'ratio_mode': 'fast',
                                          'uniqueattrs': [('RuleEvaluation', 'Index')]},
                            formatter=formatting.DiffFormatter())
@@ -163,6 +202,30 @@ def copyfile(src_file, dst_dir, file_type):
 
     return dst
 
+def deleted_tag(row,each_file_A):
+        try:
+            root = get_xml_root(each_file_A)
+            positions=re.findall("\d+", row['Position'])
+
+            for i in range(len(positions)):
+                positions[i] = int(positions[i])-1
+
+            if len(positions) == 3:
+                tag = root[positions[0]][positions[1]][positions[2]].tag
+                attrib = str(root[positions[0]][positions[1]][positions[2]].attrib)
+
+            elif len(positions) == 2:
+                tag = root[positions[0]][positions[1]].tag
+                attrib = str(root[positions[0]][positions[1]].attrib)
+
+            elif len(positions) == 1:
+                tag = root[positions[0]].tag
+                attrib = str(root[positions[0]].attrib)
+
+            return tag + attrib
+        except:
+            return row['Value_A']
+
 
 def main_work():
     A_server_path, B_server_path, output_path, start_time, end_time = readConfig()
@@ -182,7 +245,8 @@ def main_work():
         print('Processing file %d:' % i + each_file_A)
         each_file_B = ''
         columns = ['Type_B', 'Position', 'Property', 'Value_A', 'Value_B', 'Backup_A', 'Backup_B']
-
+        if 'YZMEA2QMH700_FCRL_Hold_20211228125329.xml' in each_file_A:
+            kk=1
         # reference before assigned
         file_start = each_file_A
 
@@ -287,6 +351,7 @@ def main_work():
                 #     columns += ['Backup']
                 # elif ('Backup' not in df_BA.columns) and ('Backup' in df_AB.columns):
                 #     columns += ['Backup']
+                # columns = ['Type_B', 'Position', 'Property', 'Value_A', 'Value_B', 'Backup_A', 'Backup_B']
 
                 df_each_file = df_each_file[columns]
 
@@ -294,6 +359,9 @@ def main_work():
                 df_each_file.insert(0, 'lot_sort', file_start)
                 if source_file_name_A:
                     df_each_file['Backup_A'] = source_file_name_A
+
+                df_each_file['Value_A'] = df_each_file.apply(
+                    lambda row: deleted_tag(row,each_file_A) if ('delete' == row['Type']) else row['Value_A'], axis=1)
 
                 df_result = pandas.concat([df_result, df_each_file])
 
@@ -309,6 +377,17 @@ def main_work():
 
     now = time.strftime("%Y-%m-%d %H-%M-%S", time.localtime(time.time()))  # Time now
     report_name = output_path + '\\' + 'Result - ' + now + '.csv'
+
+
+    # df_result['Value_A'] = df_result.apply(lambda row: deleted_tag(row) if ('delete' == row['Type']) else row['Value_A'],axis=1)
+
+    df_result['Property'] = df_result['Property'].apply(lambda x: x.split('}',1)[-1] if ('{http' in x and '}' in x) else x)
+    df_result['Value_A'] = df_result['Value_A'].apply(lambda x: x.split('}',1)[-1] if (type(x) ==str and '{http' in x and '}' in x) else x)
+
+
+
+
+
 
     df_result = df_result.reset_index(drop=True)
     df_result.to_csv(report_name, index=False)

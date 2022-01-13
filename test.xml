@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<OptimalPlusSummary xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.optimaltest.com/schemas/OptimalPlusSummary.xsd">
+  <Software SchemaVersion="1.4" GeneralOTVersion="7.3.4651.0" AdditionalVersion="7.3.4651.0" />
+  <RequestReference FileName="TWEA31212000_DV61666_CP2_PCN_20211201022246.zip" Timestamp="2021-12-01T02:24:55.1730733+08:00" />
+  <LotStatus Lot="DV61666" Operation="PCN" Area="WaferSort" FinalGood="12646" FinalBad="849" DataStatus="NoRulesDefined" LotDecision="Release" Timestamp="2021-12-01T02:25:51.682899+08:00">
+    <Runs>
+      <Run Index="0" Iteration="0" SubIteration="0" StartTime="2021-11-30T00:58:18" EndTime="2021-11-30T01:53:22" TotalGood="539" TotalBad="30" WaferNumber="01" WaferName="1-1" OperationName="PCN" />
+      <Run Index="1" Iteration="0" SubIteration="0" StartTime="2021-11-30T01:58:52" EndTime="2021-11-30T03:08:33" TotalGood="492" TotalBad="32" WaferNumber="02" WaferName="1-2" OperationName="PCN" />
+      <Run Index="2" Iteration="0" SubIteration="0" StartTime="2021-11-30T03:14:03" EndTime="2021-11-30T04:09:31" TotalGood="483" TotalBad="41" WaferNumber="03" WaferName="1-3" OperationName="PCN" />
+      <Run Index="3" Iteration="0" SubIteration="0" StartTime="2021-11-30T04:16:08" EndTime="2021-11-30T05:07:16" TotalGood="526" TotalBad="31" WaferNumber="04" WaferName="1-4" OperationName="PCN" />
+      <Run Index="4" Iteration="0" SubIteration="0" StartTime="2021-11-30T05:12:24" EndTime="2021-11-30T06:04:35" TotalGood="502" TotalBad="47" WaferNumber="05" WaferName="1-5" OperationName="PCN" />
+      <Run Index="5" Iteration="0" SubIteration="0" StartTime="2021-11-30T06:09:42" EndTime="2021-11-30T07:04:21" TotalGood="520" TotalBad="32" WaferNumber="06" WaferName="1-6" OperationName="PCN" />
+      <Run Index="6" Iteration="0" SubIteration="0" StartTime="2021-11-30T07:09:53" EndTime="2021-11-30T08:03:03" TotalGood="543" TotalBad="23" WaferNumber="07" WaferName="1-7" OperationName="PCN" />
+      <Run Index="7" Iteration="0" SubIteration="0" StartTime="2021-11-30T08:08:11" EndTime="2021-11-30T08:59:48" TotalGood="510" TotalBad="39" WaferNumber="08" WaferName="1-8" OperationName="PCN" />
+      <Run Index="8" Iteration="0" SubIteration="0" StartTime="2021-11-30T09:04:56" EndTime="2021-11-30T10:00:34" TotalGood="524" TotalBad="30" WaferNumber="09" WaferName="1-9" OperationName="PCN" />
+      <Run Index="9" Iteration="0" SubIteration="0" StartTime="2021-11-30T10:06:07" EndTime="2021-11-30T10:57:42" TotalGood="513" TotalBad="40" WaferNumber="10" WaferName="1-10" OperationName="PCN" />
+      <Run Index="10" Iteration="0" SubIteration="0" StartTime="2021-11-30T11:02:50" EndTime="2021-11-30T11:53:56" TotalGood="524" TotalBad="28" WaferNumber="11" WaferName="1-11" OperationName="PCN" />
+      <Run Index="11" Iteration="0" SubIteration="0" StartTime="2021-11-30T11:59:03" EndTime="2021-11-30T12:53:09" TotalGood="526" TotalBad="28" WaferNumber="12" WaferName="1-12" OperationName="PCN" />
+      <Run Index="12" Iteration="0" SubIteration="0" StartTime="2021-11-30T12:59:24" EndTime="2021-11-30T13:50:13" TotalGood="497" TotalBad="45" WaferNumber="13" WaferName="1-13" OperationName="PCN" />
+      <Run Index="13" Iteration="0" SubIteration="0" StartTime="2021-11-30T13:55:21" EndTime="2021-11-30T14:45:24" TotalGood="532" TotalBad="24" WaferNumber="14" WaferName="1-14" OperationName="PCN" />
+      <Run Index="14" Iteration="0" SubIteration="0" StartTime="2021-11-30T14:50:32" EndTime="2021-11-30T16:28:44" TotalGood="500" TotalBad="38" WaferNumber="15" WaferName="1-15" OperationName="PCN" />
+      <Run Index="15" Iteration="0" SubIteration="0" StartTime="2021-11-30T16:34:34" EndTime="2021-11-30T17:17:53" TotalGood="412" TotalBad="31" WaferNumber="16" WaferName="1-16" OperationName="PCN" />
+      <Run Index="16" Iteration="0" SubIteration="0" StartTime="2021-11-30T17:23:01" EndTime="2021-11-30T18:14:28" TotalGood="520" TotalBad="31" WaferNumber="17" WaferName="1-17" OperationName="PCN" />
+      <Run Index="17" Iteration="0" SubIteration="0" StartTime="2021-11-30T18:19:36" EndTime="2021-11-30T19:13:27" TotalGood="510" TotalBad="32" WaferNumber="18" WaferName="1-18" OperationName="PCN" />
+      <Run Index="18" Iteration="0" SubIteration="0" StartTime="2021-11-30T19:19:03" EndTime="2021-11-30T20:07:03" TotalGood="479" TotalBad="32" WaferNumber="19" WaferName="1-19" OperationName="PCN" />
+      <Run Index="19" Iteration="0" SubIteration="0" StartTime="2021-11-30T20:12:10" EndTime="2021-11-30T21:02:07" TotalGood="514" TotalBad="26" WaferNumber="20" WaferName="1-20" OperationName="PCN" />
+      <Run Index="20" Iteration="0" SubIteration="0" StartTime="2021-11-30T21:07:15" EndTime="2021-11-30T22:11:38" TotalGood="466" TotalBad="35" WaferNumber="21" WaferName="1-21" OperationName="PCN" />
+      <Run Index="21" Iteration="0" SubIteration="0" StartTime="2021-11-30T22:17:31" EndTime="2021-11-30T23:08:41" TotalGood="491" TotalBad="44" WaferNumber="22" WaferName="1-22" OperationName="PCN" />
+      <Run Index="22" Iteration="0" SubIteration="0" StartTime="2021-11-30T23:13:49" EndTime="2021-12-01T00:04:44" TotalGood="517" TotalBad="34" WaferNumber="23" WaferName="1-23" OperationName="PCN" />
+      <Run Index="23" Iteration="0" SubIteration="0" StartTime="2021-12-01T00:09:51" EndTime="2021-12-01T01:04:53" TotalGood="497" TotalBad="43" WaferNumber="24" WaferName="1-24" OperationName="PCN" />
+      <Run Index="24" Iteration="0" SubIteration="0" StartTime="2021-12-01T01:11:05" EndTime="2021-12-01T02:13:16" TotalGood="509" TotalBad="33" WaferNumber="25" WaferName="1-25" OperationName="PCN" />
+    </Runs>
+    <RulesStatus Readiness="Full">
+      <RuleEvaluation Index="0" RunIndex="0" Name="PAT" Type="PAT" Version="0" ExecutionStatus="EvaluatedNoViolations" ExecutionTime="2021-12-01T02:25:50.839+08:00" IsCumulative="true" WaferNumber="01" WaferName="1-1" />
+      <RuleEvaluation Index="1" RunIndex="10" Name="PAT" Type="PAT" Version="0" ExecutionStatus="EvaluatedNoViolations" ExecutionTime="2021-12-01T02:25:50.839+08:00" IsCumulative="true" WaferNumber="11" WaferName="1-11" />
+      <RuleEvaluation Index="2" RunIndex="1" Name="PAT" Type="PAT" Version="0" ExecutionStatus="EvaluatedNoViolations" ExecutionTime="2021-12-01T02:25:50.839+08:00" IsCumulative="true" WaferNumber="02" WaferName="1-2" />
+      <RuleEvaluation Index="3" RunIndex="15" Name="PAT" Type="PAT" Version="0" ExecutionStatus="EvaluatedNoViolations" ExecutionTime="2021-12-01T02:25:50.839+08:00" IsCumulative="true" WaferNumber="16" WaferName="1-16" />
+      <RuleEvaluation Index="4" RunIndex="23" Name="PAT" Type="PAT" Version="0" ExecutionStatus="EvaluatedNoViolations" ExecutionTime="2021-12-01T02:25:50.839+08:00" IsCumulative="true" WaferNumber="24" WaferName="1-24" />
+      <RuleEvaluation Index="5" RunIndex="6" Name="PAT" Type="PAT" Version="0" ExecutionStatus="EvaluatedNoViolations" ExecutionTime="2021-12-01T02:25:50.839+08:00" IsCumulative="true" WaferNumber="07" WaferName="1-7" />
+      <RuleEvaluation Index="6" RunIndex="16" Name="PAT" Type="PAT" Version="0" ExecutionStatus="EvaluatedNoViolations" ExecutionTime="2021-12-01T02:25:50.839+08:00" IsCumulative="true" WaferNumber="17" WaferName="1-17" />
+      <RuleEvaluation Index="7" RunIndex="7" Name="PAT" Type="PAT" Version="0" ExecutionStatus="EvaluatedNoViolations" ExecutionTime="2021-12-01T02:25:50.839+08:00" IsCumulative="true" WaferNumber="08" WaferName="1-8" />
+      <RuleEvaluation Index="8" RunIndex="2" Name="PAT" Type="PAT" Version="0" ExecutionStatus="EvaluatedNoViolations" ExecutionTime="2021-12-01T02:25:50.839+08:00" IsCumulative="true" WaferNumber="03" WaferName="1-3" />
+      <RuleEvaluation Index="9" RunIndex="17" Name="PAT" Type="PAT" Version="0" ExecutionStatus="EvaluatedNoViolations" ExecutionTime="2021-12-01T02:25:50.839+08:00" IsCumulative="true" WaferNumber="18" WaferName="1-18" />
+      <RuleEvaluation Index="10" RunIndex="5" Name="PAT" Type="PAT" Version="0" ExecutionStatus="EvaluatedNoViolations" ExecutionTime="2021-12-01T02:25:50.839+08:00" IsCumulative="true" WaferNumber="06" WaferName="1-6" />
+      <RuleEvaluation Index="11" RunIndex="18" Name="PAT" Type="PAT" Version="0" ExecutionStatus="EvaluatedNoViolations" ExecutionTime="2021-12-01T02:25:50.839+08:00" IsCumulative="true" WaferNumber="19" WaferName="1-19" />
+      <RuleEvaluation Index="12" RunIndex="14" Name="PAT" Type="PAT" Version="0" ExecutionStatus="EvaluatedNoViolations" ExecutionTime="2021-12-01T02:25:50.839+08:00" IsCumulative="true" WaferNumber="15" WaferName="1-15" />
+      <RuleEvaluation Index="13" RunIndex="20" Name="PAT" Type="PAT" Version="0" ExecutionStatus="EvaluatedNoViolations" ExecutionTime="2021-12-01T02:25:50.839+08:00" IsCumulative="true" WaferNumber="21" WaferName="1-21" />
+      <RuleEvaluation Index="14" RunIndex="3" Name="PAT" Type="PAT" Version="0" ExecutionStatus="EvaluatedNoViolations" ExecutionTime="2021-12-01T02:25:50.839+08:00" IsCumulative="true" WaferNumber="04" WaferName="1-4" />
+      <RuleEvaluation Index="15" RunIndex="24" Name="PAT" Type="PAT" Version="0" ExecutionStatus="EvaluatedNoViolations" ExecutionTime="2021-12-01T02:25:50.839+08:00" IsCumulative="true" WaferNumber="25" WaferName="1-25" />
+      <RuleEvaluation Index="16" RunIndex="22" Name="PAT" Type="PAT" Version="0" ExecutionStatus="EvaluatedNoViolations" ExecutionTime="2021-12-01T02:25:50.839+08:00" IsCumulative="true" WaferNumber="23" WaferName="1-23" />
+      <RuleEvaluation Index="17" RunIndex="11" Name="PAT" Type="PAT" Version="0" ExecutionStatus="EvaluatedNoViolations" ExecutionTime="2021-12-01T02:25:50.839+08:00" IsCumulative="true" WaferNumber="12" WaferName="1-12" />
+      <RuleEvaluation Index="18" RunIndex="9" Name="PAT" Type="PAT" Version="0" ExecutionStatus="EvaluatedNoViolations" ExecutionTime="2021-12-01T02:25:50.839+08:00" IsCumulative="true" WaferNumber="10" WaferName="1-10" />
+      <RuleEvaluation Index="19" RunIndex="12" Name="PAT" Type="PAT" Version="0" ExecutionStatus="EvaluatedNoViolations" ExecutionTime="2021-12-01T02:25:50.839+08:00" IsCumulative="true" WaferNumber="13" WaferName="1-13" />
+      <RuleEvaluation Index="20" RunIndex="4" Name="PAT" Type="PAT" Version="0" ExecutionStatus="EvaluatedNoViolations" ExecutionTime="2021-12-01T02:25:50.839+08:00" IsCumulative="true" WaferNumber="05" WaferName="1-5" />
+      <RuleEvaluation Index="21" RunIndex="21" Name="PAT" Type="PAT" Version="0" ExecutionStatus="EvaluatedNoViolations" ExecutionTime="2021-12-01T02:25:50.839+08:00" IsCumulative="true" WaferNumber="22" WaferName="1-22" />
+      <RuleEvaluation Index="22" RunIndex="13" Name="PAT" Type="PAT" Version="0" ExecutionStatus="EvaluatedNoViolations" ExecutionTime="2021-12-01T02:25:50.839+08:00" IsCumulative="true" WaferNumber="14" WaferName="1-14" />
+      <RuleEvaluation Index="23" RunIndex="8" Name="PAT" Type="PAT" Version="0" ExecutionStatus="EvaluatedNoViolations" ExecutionTime="2021-12-01T02:25:50.839+08:00" IsCumulative="true" WaferNumber="09" WaferName="1-9" />
+      <RuleEvaluation Index="24" RunIndex="19" Name="PAT" Type="PAT" Version="0" ExecutionStatus="EvaluatedNoViolations" ExecutionTime="2021-12-01T02:25:50.839+08:00" IsCumulative="true" WaferNumber="20" WaferName="1-20" />
+    </RulesStatus>
+  </LotStatus>
+</OptimalPlusSummary>

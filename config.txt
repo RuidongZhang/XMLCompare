@@ -25,8 +25,8 @@
 # # End_time|2021-01-01
 # End_time|now
 
-A_server|\\nardc02nasp201.wbi.nxp.com\USPHX01OPLOADER-FS01\OptimalTestFiles\SequoiaWidgets\ZF\A-BCompare\New folder\FT-A-XML
-B_server|\\nardc02nasp201.wbi.nxp.com\USPHX01OPLOADER-FS01\OptimalTestFiles\SequoiaWidgets\ZF\A-BCompare\New folder\FT-B-XML
+A_server|E:\XMLCompare\FT\A-XML
+B_server|E:\XMLCompare\FT\B-XML
 
 Output|E:\XMLCompare\FT\result
 
