@@ -1,0 +1,29 @@
+pyinstaller -w -F --noupx TransExcel2Csv20191205.py calculatenow.py crossope_plot.py stdfplot.py subtk_otquery.py subtk_otquery_for3oper.py subtkplot.py
+
+pyinstaller -w -F --noupx Sheetcompare20190717.py
+
+
+下载后解压缩，把其中的upx.exe文件放到Python安装目录的scripts子文件夹中：-X, –upx
+
+
+pyinstaller -F XMLCom.py
+
+利用pip安装python包遇到socket.timeout:The read operation timed out问题的解决方法
+windows下输入 pip --default-timeout=100 install 包名
+
+#建立虚拟环境
+pipenv install
+#进入虚拟环境（上一步可省略,因为没有虚拟环境的话会自动建立一个）
+pipenv shell
+#安装模块
+pipenv install requests pyquery pysimplegui fake_useragent
+#打包的模块也要安装
+pipenv install pyinstaller
+#开始打包
+pyinstaller -Fw E:\test\url_crawler.py
+virtual EV C:\Users\nxf53379\.virtualenvs\EDfinal\Scripts activate
+
+-D	生成one-folder的程序（默认）	生成结果是一个目录，各种第三方依赖、资源和exe同时存储在该目录
+-F	生成one-file的程序	生成结果是一个exe文件，所有的第三方依赖、资源和代码均被打包进该exe内
+–specpath	指定.spec文件的存储路径	默认：当前目录
+-n	生成的.exe文件和.spec的文件名	默认：用户脚本的名称，即main.py和main.spec

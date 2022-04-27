@@ -14,11 +14,10 @@ def get_xml_root(file):
         # root = ET.fromstring(country_string) #从字符串传递xml
         root = tree.getroot()  # 获得root节点
     except Exception as e:
-        print("Error:cannot parse file:%s"%file +str(e))
+        print("Error:cannot parse file:%s" % file + str(e))
         root = ''
         # sys.exit(1)
     return root
-
 
 
 def readConfig():
@@ -26,7 +25,8 @@ def readConfig():
     lines = fopen.readlines()
 
     for row in lines:
-
+        if row.startswith('e142_format'):
+            e142_format = row.split('|')[1]
         if row.startswith('A_server'):
             A_server_path = row.split('|')[1]
         if row.startswith('B_server'):
@@ -47,15 +47,16 @@ def readConfig():
 
     fopen.close()
 
-    return A_server_path, B_server_path, output_path, start_time, end_time
+    return A_server_path, B_server_path, output_path, start_time, end_time, e142_format
+
 
 def get_data(file):
-    f = open(file,'r',encoding='utf-8')
+    f = open(file, 'r', encoding='utf-8')
     data = f.readlines()
     content = ''
-    i=0
+    i = 0
     for each in data:
-        i+=1
+        i += 1
         # if '<RuleEvaluation' in each:
         #     each = each.replace('/>','>%s</RuleEvaluation>'%i)
         # elif '<Software' in each:
@@ -65,12 +66,12 @@ def get_data(file):
         # elif '<Run ' in each:
         #     each = each.replace('/>','>%s</Run>'%i)
         if '<Runs />' in each:
-            each = each.replace('<Runs />','<Runs>') + each.replace('<Runs />','</Runs>')
+            each = each.replace('<Runs />', '<Runs>') + each.replace('<Runs />', '</Runs>')
         elif '<RulesStatus />' in each:
 
-            each = each.replace('<RulesStatus />','<RulesStatus>') + each.replace('<RulesStatus />','</RulesStatus>')
+            each = each.replace('<RulesStatus />', '<RulesStatus>') + each.replace('<RulesStatus />', '</RulesStatus>')
 
-        content+=each
+        content += each
 
 
     return content
@@ -126,7 +127,7 @@ def readFolder(path):
 #
 #     for
 
-def strList(result_str):
+def strList(result_str, format=None):
     list_tmp = result_str.split('\n')
     result_list = []
     flag_5col = False
@@ -135,7 +136,10 @@ def strList(result_str):
         tmp = each[1:][0: -1].split(',', 4)
 
         # zip 4 elements
-        if len(tmp) > 4:
+        if format == '3':
+            if len(tmp) == 3:
+                tmp = tmp[0:2] + [''] + tmp[2:]
+        elif len(tmp) > 4:
             tmp = tmp[0:5]
             flag_5col = True
         elif len(tmp) < 4:
@@ -194,41 +198,45 @@ def get_type(file_path):
     return file_type
 
 
-def copyfile(src_file, dst_dir, file_type):
+def copyfile(src_file, dst_dir, file_type, suffix=None):
     import shutil
-
-    dst = dst_dir.rstrip('\n') + '\\' + src_file.split('\\')[-1].replace(file_type, 'xml')
+    if suffix:
+        dst = dst_dir.rstrip('\n') + '\\' + src_file.split('\\')[-1].replace(file_type, 'xml').replace('.',
+                                                                                                       '-%s.' % suffix)
+    else:
+        dst = dst_dir.rstrip('\n') + '\\' + src_file.split('\\')[-1].replace(file_type, 'xml')
     shutil.copyfile(src_file, dst)
 
     return dst
 
-def deleted_tag(row,each_file_A):
-        try:
-            root = get_xml_root(each_file_A)
-            positions=re.findall("\d+", row['Position'])
 
-            for i in range(len(positions)):
-                positions[i] = int(positions[i])-1
+def deleted_tag(row, each_file_A):
+    try:
+        root = get_xml_root(each_file_A)
+        positions = re.findall("\d+", row['Position'])
 
-            if len(positions) == 3:
-                tag = root[positions[0]][positions[1]][positions[2]].tag
-                attrib = str(root[positions[0]][positions[1]][positions[2]].attrib)
+        for i in range(len(positions)):
+            positions[i] = int(positions[i]) - 1
 
-            elif len(positions) == 2:
-                tag = root[positions[0]][positions[1]].tag
-                attrib = str(root[positions[0]][positions[1]].attrib)
+        if len(positions) == 3:
+            tag = root[positions[0]][positions[1]][positions[2]].tag
+            attrib = str(root[positions[0]][positions[1]][positions[2]].attrib)
 
-            elif len(positions) == 1:
-                tag = root[positions[0]].tag
-                attrib = str(root[positions[0]].attrib)
+        elif len(positions) == 2:
+            tag = root[positions[0]][positions[1]].tag
+            attrib = str(root[positions[0]][positions[1]].attrib)
 
-            return tag + attrib
-        except:
-            return row['Value_A']
+        elif len(positions) == 1:
+            tag = root[positions[0]].tag
+            attrib = str(root[positions[0]].attrib)
+
+        return tag + attrib
+    except:
+        return row['Value_A']
 
 
 def main_work():
-    A_server_path, B_server_path, output_path, start_time, end_time = readConfig()
+    A_server_path, B_server_path, output_path, start_time, end_time, e142_format = readConfig()
 
     list_A = readFolder(A_server_path)
     list_B = readFolder(B_server_path)
@@ -245,8 +253,8 @@ def main_work():
         print('Processing file %d:' % i + each_file_A)
         each_file_B = ''
         columns = ['Type_B', 'Position', 'Property', 'Value_A', 'Value_B', 'Backup_A', 'Backup_B']
-        if 'YZMEA2QMH700_FCRL_Hold_20211228125329.xml' in each_file_A:
-            kk=1
+        # if 'YZMEA2QMH700_FCRL_Hold_20211228125329.xml' in each_file_A:
+        #     kk=1
         # reference before assigned
         file_start = each_file_A
 
@@ -257,10 +265,24 @@ def main_work():
                 tmp = each_file_A.split('_')
                 lot = tmp[0]
 
-                sort = tmp[1]
-                if len(tmp) == 5:
-                    sort += '_' + tmp[2]
-                file_start = lot + '_' + sort
+                if e142_format in ['4', 4]:
+
+                    sort = tmp[1]
+                    if len(tmp) == 5:
+                        sort += '_' + tmp[2]
+                    file_start = lot + '_' + sort
+                    if file_type in ['e142', 'E142']:
+                        file_start += '_' + tmp[3]
+
+                elif e142_format in ['3', 3]:
+
+                    sort = tmp[1]
+                    if len(tmp) == 4:
+                        sort += '_' + tmp[2]
+                    file_start = lot + '_' + sort
+                    if file_type in ['e142', 'E142']:
+                        file_start += '_' + tmp[3]
+
                 each_file_A = A_server_path.replace('\n', '') + '\\' + each_file_A
 
                 # skip file out of (start,end)
@@ -314,8 +336,14 @@ def main_work():
                     continue
 
                 if file_type != 'xml':
-                    each_file_A = copyfile(each_file_A, output_path, file_type)
-                    each_file_B = copyfile(each_file_B, output_path, file_type)
+                    if each_file_A.split('\\')[-1] == each_file_B.split('\\')[-1]:
+                        suffix_A = 'A'
+                        suffix_B = 'B'
+                    else:
+                        suffix_B = suffix_A = None
+
+                    each_file_A = copyfile(each_file_A, output_path, file_type, suffix=suffix_A)
+                    each_file_B = copyfile(each_file_B, output_path, file_type, suffix=suffix_B)
 
                 #     shutil.copyfile(each_file_A, each_file_A.replace(file_type, 'xml'))
                 #     shutil.copyfile(each_file_B, each_file_B.replace(file_type, 'xml'))
@@ -327,11 +355,11 @@ def main_work():
 
                 # B to A
                 out_AB = compare_xmls(each_file_A, each_file_B)
-                df_AB = strList(out_AB)
+                df_AB = strList(out_AB,e142_format)
 
                 # A to B
                 out_BA = compare_xmls(each_file_B, each_file_A)
-                df_BA = strList(out_BA)
+                df_BA = strList(out_BA,e142_format)
 
                 if file_type != 'xml':
                     os.remove(each_file_A)
@@ -361,7 +389,7 @@ def main_work():
                     df_each_file['Backup_A'] = source_file_name_A
 
                 df_each_file['Value_A'] = df_each_file.apply(
-                    lambda row: deleted_tag(row,each_file_A) if ('delete' == row['Type']) else row['Value_A'], axis=1)
+                    lambda row: deleted_tag(row, each_file_A) if ('delete' == row['Type']) else row['Value_A'], axis=1)
 
                 df_result = pandas.concat([df_result, df_each_file])
 
@@ -381,13 +409,16 @@ def main_work():
 
     # df_result['Value_A'] = df_result.apply(lambda row: deleted_tag(row) if ('delete' == row['Type']) else row['Value_A'],axis=1)
 
-    df_result['Property'] = df_result['Property'].apply(lambda x: x.split('}',1)[-1] if ('{http' in x and '}' in x) else x)
-    df_result['Value_A'] = df_result['Value_A'].apply(lambda x: x.split('}',1)[-1] if (type(x) ==str and '{http' in x and '}' in x) else x)
-
-
-
-
-
+    try:
+        df_result['Property'] = df_result['Property'].apply(
+            lambda x: x.split('}', 1)[-1] if ('{http' in x and '}' in x) else x)
+    except Exception as e:
+        print(e, 'Error:main Property')
+    try:
+        df_result['Value_A'] = df_result['Value_A'].apply(
+            lambda x: x.split('}', 1)[-1] if (type(x) == str and '{http' in x and '}' in x) else x)
+    except Exception as e:
+        print(e, 'Error:main Value A')
 
     df_result = df_result.reset_index(drop=True)
     df_result.to_csv(report_name, index=False)
