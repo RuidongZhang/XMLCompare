@@ -75,6 +75,57 @@ def get_data(file):
 
 
     return content
+def not_empty(s):
+    return s and s.strip()
+
+def data_str(observed):
+    observed = observed.split('\n')
+    observed = list(filter(not_empty, observed))
+
+    data = []
+    for row in observed:
+        if not row:
+            continue
+        while ' ' in row:
+            row = row.replace(' ','')
+        while '\t' in row:
+            row = row.replace('\t','')
+        data.append(row)
+
+    return data
+
+
+def diff_eg(observed, expected):
+
+    observed = data_str(observed)
+    expected = data_str(expected)
+
+    length = max([len(observed),len(expected)])
+
+    while len(observed) < length:
+        observed += ['']
+
+    while len(expected) < length:
+        expected += ['']
+
+    i = 0
+    diff = []
+    while i < len(observed):
+        if observed[i] == expected[i]:
+            pass
+        else:
+            diff.append(['Update','Row - %d'%(i+1),'',expected[i],''])
+
+        i+=1
+
+    if not diff:
+        diff=[['']*5]
+
+
+    return pandas.DataFrame(diff,columns=['Type', 'Position','Property','Value','Backup'])
+
+
+
 
 def compare_xmls(observed, expected, file_type='xml'):
     formatter = formatting.XMLFormatter()
@@ -106,6 +157,20 @@ def compare_xmls(observed, expected, file_type='xml'):
         uniqueattrs = [('RuleEvaluation', 'Name')]
     observed = get_data(observed)
     expected = get_data(expected)
+
+    if (observed == '') and (expected == ''):
+        df = pandas.DataFrame([{'Type': '', 'Position': '', 'Property': '', 'Value': '', 'Backup': '',}])
+        return df
+    else:
+        i=1
+        pass
+
+    if file_type == 'eg':
+        # if observed == expected:
+        if False:
+            return ''
+        return diff_eg(observed, expected)
+
     diff = main.diff_texts(observed, expected,
                            diff_options={'fast_match': True, 'F': 0.5, 'ratio_mode': 'fast',
                                          'uniqueattrs': [('RuleEvaluation', 'Index')]},
@@ -128,6 +193,10 @@ def readFolder(path):
 #     for
 
 def strList(result_str, format=None):
+
+    if not result_str:
+       return strDf([], False)
+
     list_tmp = result_str.split('\n')
     result_list = []
     flag_5col = False
@@ -192,6 +261,8 @@ def get_type(file_path):
         file_type = 'xml'
     elif '.e142' in file_path:
         file_type = 'e142'
+    elif '.eg' in file_path:
+        file_type = 'eg'
     else:
         file_type = file_path.split('.')[-1]
 
@@ -278,10 +349,10 @@ def main_work():
 
                     sort = tmp[1]
                     if len(tmp) == 4:
-                        sort += '_' + tmp[2]
+                        sort += '_' + tmp[2]+'_'+tmp[3]
                     file_start = lot + '_' + sort
-                    if file_type in ['e142', 'E142']:
-                        file_start += '_' + tmp[3]
+                    # if file_type in ['e142', 'E142']:
+                    #     file_start += '_' + tmp[3]
 
                 each_file_A = A_server_path.replace('\n', '') + '\\' + each_file_A
 
@@ -353,13 +424,18 @@ def main_work():
                 #     each_file_A = each_file_A.replace(file_type, 'xml')
                 #     each_file_B = each_file_B.replace(file_type, 'xml')
 
-                # B to A
-                out_AB = compare_xmls(each_file_A, each_file_B)
-                df_AB = strList(out_AB,e142_format)
+                if file_type == 'eg':
+                    df_AB = compare_xmls(each_file_A, each_file_B,file_type)
+                    df_BA = compare_xmls(each_file_B, each_file_A,file_type)
 
-                # A to B
-                out_BA = compare_xmls(each_file_B, each_file_A)
-                df_BA = strList(out_BA,e142_format)
+                else:
+                    # B to A
+                    out_AB = compare_xmls(each_file_A, each_file_B,file_type)
+                    df_AB = strList(out_AB, e142_format)
+
+                    # A to B
+                    out_BA = compare_xmls(each_file_B, each_file_A,file_type)
+                    df_BA = strList(out_BA,e142_format)
 
                 if file_type != 'xml':
                     os.remove(each_file_A)
