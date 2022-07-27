@@ -5,6 +5,8 @@ pyinstaller -w -F --noupx Sheetcompare20190717.py
 
 下载后解压缩，把其中的upx.exe文件放到Python安装目录的scripts子文件夹中：-X, –upx
 
+#使用清华大学的源
+pip install -i https://pypi.tuna.tsinghua.edu.cn/simple –upgrade tensorflow-gpu
 
 pyinstaller -F XMLCom.py
 

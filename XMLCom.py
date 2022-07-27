@@ -4,9 +4,11 @@ import time
 import sys
 import pandas
 import re
+
 path = os.path.dirname(os.path.realpath(sys.argv[0]))
 
 import xml.etree.ElementTree as ET
+
 
 def get_xml_root(file):
     try:
@@ -73,10 +75,26 @@ def get_data(file):
 
         content += each
 
-
     return content
+
+
 def not_empty(s):
     return s and s.strip()
+
+
+def get_lot_e142(file):
+    f = open(file, 'r', encoding='utf-8')
+    data = f.readlines()
+    # observed = data_str(observed)
+    # observed = data.split('\n')
+    observed = list(filter(not_empty, data))
+
+    for row in observed:
+        if '<LotId>' in row:
+            lot = row.split('<LotId>')[-1]
+            lot = lot.split('<')[0]
+            return lot
+
 
 def data_str(observed):
     observed = observed.split('\n')
@@ -87,20 +105,19 @@ def data_str(observed):
         if not row:
             continue
         while ' ' in row:
-            row = row.replace(' ','')
+            row = row.replace(' ', '')
         while '\t' in row:
-            row = row.replace('\t','')
+            row = row.replace('\t', '')
         data.append(row)
 
     return data
 
 
 def diff_eg(observed, expected):
-
     observed = data_str(observed)
     expected = data_str(expected)
 
-    length = max([len(observed),len(expected)])
+    length = max([len(observed), len(expected)])
 
     while len(observed) < length:
         observed += ['']
@@ -114,17 +131,14 @@ def diff_eg(observed, expected):
         if observed[i] == expected[i]:
             pass
         else:
-            diff.append(['Update','Row - %d'%(i+1),'',expected[i],''])
+            diff.append(['Update', 'Row - %d' % (i + 1), '', expected[i], ''])
 
-        i+=1
+        i += 1
 
     if not diff:
-        diff=[['']*5]
+        diff = [[''] * 5]
 
-
-    return pandas.DataFrame(diff,columns=['Type', 'Position','Property','Value','Backup'])
-
-
+    return pandas.DataFrame(diff, columns=['Type', 'Position', 'Property', 'Value', 'Backup'])
 
 
 def compare_xmls(observed, expected, file_type='xml'):
@@ -159,10 +173,10 @@ def compare_xmls(observed, expected, file_type='xml'):
     expected = get_data(expected)
 
     if (observed == '') and (expected == ''):
-        df = pandas.DataFrame([{'Type': '', 'Position': '', 'Property': '', 'Value': '', 'Backup': '',}])
+        df = pandas.DataFrame([{'Type': '', 'Position': '', 'Property': '', 'Value': '', 'Backup': '', }])
         return df
     else:
-        i=1
+        i = 1
         pass
 
     if file_type == 'eg':
@@ -193,9 +207,8 @@ def readFolder(path):
 #     for
 
 def strList(result_str, format=None):
-
     if not result_str:
-       return strDf([], False)
+        return strDf([], False)
 
     list_tmp = result_str.split('\n')
     result_list = []
@@ -219,6 +232,25 @@ def strList(result_str, format=None):
     return strDf(result_list, flag_5col)
 
 
+def reformat(row):
+    proper = row['Property']
+    value = row['Value']
+
+    if type(proper) != str:
+        return row
+    if type(value) != str:
+        return row
+
+    if row['Type'] == 'insert':
+        value = value.replace(' ', '')
+        if value.isdecimal():
+            value = int(value) + 1
+            row['Value'] = value
+            row['Position'] = row['Position'] + '/*[%d]' % value
+
+    return row
+
+
 # list to Dataframe
 def strDf(lis, flag_5col=False):
     columns = ['Type', 'Position', 'Property', 'Value']
@@ -228,6 +260,8 @@ def strDf(lis, flag_5col=False):
     else:
         df_each_file = pandas.DataFrame(lis, columns=columns)
         df_each_file['Backup'] = ''
+
+    df_each_file = df_each_file.apply(reformat, axis=1)
 
     return df_each_file
 
@@ -349,7 +383,7 @@ def main_work():
 
                     sort = tmp[1]
                     if len(tmp) == 4:
-                        sort += '_' + tmp[2]+'_'+tmp[3]
+                        sort += '_' + tmp[2] + '_' + tmp[3]
                     file_start = lot + '_' + sort
                     # if file_type in ['e142', 'E142']:
                     #     file_start += '_' + tmp[3]
@@ -425,21 +459,18 @@ def main_work():
                 #     each_file_B = each_file_B.replace(file_type, 'xml')
 
                 if file_type == 'eg':
-                    df_AB = compare_xmls(each_file_A, each_file_B,file_type)
-                    df_BA = compare_xmls(each_file_B, each_file_A,file_type)
+                    df_AB = compare_xmls(each_file_A, each_file_B, file_type)
+                    df_BA = compare_xmls(each_file_B, each_file_A, file_type)
 
                 else:
                     # B to A
-                    out_AB = compare_xmls(each_file_A, each_file_B,file_type)
+                    out_AB = compare_xmls(each_file_A, each_file_B, file_type)
                     df_AB = strList(out_AB, e142_format)
 
                     # A to B
-                    out_BA = compare_xmls(each_file_B, each_file_A,file_type)
-                    df_BA = strList(out_BA,e142_format)
+                    out_BA = compare_xmls(each_file_B, each_file_A, file_type)
+                    df_BA = strList(out_BA, e142_format)
 
-                if file_type != 'xml':
-                    os.remove(each_file_A)
-                    os.remove(each_file_B)
                 #
                 #
                 #
@@ -457,6 +488,16 @@ def main_work():
                 #     columns += ['Backup']
                 # columns = ['Type_B', 'Position', 'Property', 'Value_A', 'Value_B', 'Backup_A', 'Backup_B']
 
+                # fill del with insert
+                if len(df_each_file):
+
+                    A_del = df_BA[df_BA['Type'].isin(['insert', 'insert-attribute'])].copy()
+                    if len(A_del):
+                        A_del['Type'] = A_del['Type'].str.replace('insert', 'delete')
+                        A_del.rename(columns={'Value': 'Value_A', 'Type': 'Type_B'}, inplace=True)
+                        df_each_file = df_each_file[~df_each_file['Type_B'].isin(['delete', 'delete-attribute'])]
+                        df_each_file = pandas.concat([df_each_file, A_del])
+
                 df_each_file = df_each_file[columns]
 
                 df_each_file.rename(columns={'Type_B': 'Type'}, inplace=True)
@@ -466,6 +507,14 @@ def main_work():
 
                 df_each_file['Value_A'] = df_each_file.apply(
                     lambda row: deleted_tag(row, each_file_A) if ('delete' == row['Type']) else row['Value_A'], axis=1)
+
+                if file_type in ['e142']:
+                    lot_e142 = get_lot_e142(each_file_A)
+                    df_each_file.insert(1, 'LotId', lot_e142)
+
+                if file_type != 'xml':
+                    os.remove(each_file_A)
+                    os.remove(each_file_B)
 
                 df_result = pandas.concat([df_result, df_each_file])
 
@@ -482,12 +531,11 @@ def main_work():
     now = time.strftime("%Y-%m-%d %H-%M-%S", time.localtime(time.time()))  # Time now
     report_name = output_path + '\\' + 'Result - ' + now + '.csv'
 
-
     # df_result['Value_A'] = df_result.apply(lambda row: deleted_tag(row) if ('delete' == row['Type']) else row['Value_A'],axis=1)
 
     try:
         df_result['Property'] = df_result['Property'].apply(
-            lambda x: x.split('}', 1)[-1] if ('{http' in x and '}' in x) else x)
+            lambda x: x.split('}', 1)[-1] if (('{' in x) and ('}' in x) and (x[-1] != '}')) else x)
     except Exception as e:
         print(e, 'Error:main Property')
     try:

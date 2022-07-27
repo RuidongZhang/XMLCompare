@@ -25,8 +25,8 @@
 # # End_time|2021-01-01
 # End_time|now
 
-A_server|E:\XMLCompare\FT\ATKH\A
-B_server|E:\XMLCompare\FT\ATKH\B
+A_server|D:\XMLCompare\ATBK\MAP\C
+B_server|D:\XMLCompare\ATBK\MAP\A
 # A_server|E:\XMLCompare\A server InkMap
 # B_server|E:\XMLCompare\B server InkMap
 

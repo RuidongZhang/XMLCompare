@@ -1,81 +1,55 @@
-from xmldiff import main, formatting
-import os
-import time
 import sys
-import pandas
-import xml
+import difflib
+import time
+import os
 
-def compare_xmls(observed, expected,file_type='xml'):
-    formatter = formatting.XMLFormatter()
-    # FYI: https://xmldiff.readthedocs.io/en/stable
-    #
-    # diff_options: A dictionary containing options that will be passed into the Differ(): F: A value between 0 and 1
-    # that determines how similar two XML nodes must be to match as the same in both trees. Defaults to 0.5.
-    #
-    # A higher value requires a smaller difference between two nodes for them to match. Set the value high,
-    # and you will see more nodes inserted and deleted instead of being updated. Set the value low, and you will get
-    # more updates instead of inserts and deletes.
-    #
-    # uniqueattrs: A list of XML node attributes that will uniquely identify a node. See Unique Attributes for more
-    # info.
-    #
-    # Defaults to ['{http://www.w3.org/XML/1998/namespace}id'].
-    #
-    # ratio_mode:
-    #
-    # The ratio_mode determines how accurately the similarity between two nodes is calculated. The choices are
-    # 'accurate', 'fast' and 'faster'. Defaults to 'fast'.
-    #
-    # Using 'faster' often results in less optimal edits scripts, in other words, you will have more actions to
-    # achieve the same result. Using 'accurate' will be significantly slower, especially if your nodes have long
-    # texts or many attributes.
-    # if file_type == 'xml':
-    #     uniqueattrs = [('RuleEvaluation', 'Name')]
-    # else:
-    #     uniqueattrs = [('RuleEvaluation', 'Name')]
-    # observed=observed.replace('xml','html')
-    # expected=expected.replace('xml','html')
-    def get_data(file):
-        f = open(file,'r',encoding='utf-8')
-        data = f.readlines()
-        content = ''
-        i=0
-        for each in data:
-            i+=1
-            # if '<RuleEvaluation' in each:
-            #     each = each.replace('/>','>%s</RuleEvaluation>'%i)
-            # elif '<Software' in each:
-            #     each = each.replace('/>','>%s</Software>'%i)
-            # elif '<RequestReference' in each:
-            #     each = each.replace('/>','>%s</RequestReference>'%i)
-            # elif '<Run ' in each:
-            #     each = each.replace('/>','>%s</Run>'%i)
+"""
+创作时间：2017-10-08 23:30 09
+版本： 1.0.0
+"""
 
 
-            content+=each
+def main():
+    """主函数"""
+    try:
+        f1 = 'E:\\XMLCompare\\FT\\result\\SVV026-04F3_W1_WH1_20220422110052-A.xml'  # 获取文件名
+        f2 = 'E:\\XMLCompare\\FT\\result\\SVV026-04F3_W1_WH1_20220422110052-B.xml'
+    except Exception as e:
+        print("Error: " + str(e))
+        print("Usage : python compareFile.py filename1 filename2")
+        sys.exit()
+
+    if f1 == "" or f2 == "":  # 参数不够
+        print("Usage : python compareFile.py filename1 filename2")
+        sys.exit()
+
+    tf1 = readFile(f1)
+    tf2 = readFile(f2)
+
+    d = difflib.HtmlDiff()  # 创建一个实例difflib.HtmlDiff
+    writeFile(d.make_file(tf1, tf2))  # 生成一个比较后的报告文件，格式为html
 
 
-        return content
-
-    observed = get_data(observed)
-    expected = get_data(expected)
-
-
-    diff = main.diff_texts(observed, expected,
-                           diff_options={'fast_match':True,'F': 0.5, 'ratio_mode': 'faster',},
-                           formatter=formatting.DiffFormatter())
-
-    # diff = main.diff_files(observed, expected,
-    #
-    #                        formatter=formatting.XMLFormatter())
+def readFile(filename):
+    """读取文件，并处理"""
+    try:
+        fileHandle = open(filename, "r")
+        text = fileHandle.read().splitlines()
+        fileHandle.close()
+        return text
+    except IOError as e:
+        print("Read file error: " + str(e))
+        sys.exit()
 
 
-    return diff
+def writeFile(file):
+    """写入文件"""
+    diffFile = open('diff_{}_.html'.format(time.strftime("%Y_%m_%d_%H_%M_%S", time.localtime())), "w")
+    diffFile.write("<meta charset='UTF-8'>")
+    diffFile.write(file)
+    print("The file on {}".format(os.path.abspath(str(diffFile.name))))  # 提示文件生成在什么地方
+    diffFile.close()
 
 
-if __name__ == '__main__':
-
-    observed='E:\\XMLCompare\\FT\\A\\DV57833_CP1_PHN_Release_20210220112111.xml'
-    expected='E:\\XMLCompare\\FT\\B\\DV57833_CP1_PHN_Release_20210220112021.xml'
-    compare_xmls(observed, expected, file_type='xml')
-
+if __name__ == "__main__":
+    main()
