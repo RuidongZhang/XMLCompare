@@ -341,6 +341,7 @@ def deleted_tag(row, each_file_A):
 
 
 def main_work():
+    print('2022-7-28 Update Error description')
     A_server_path, B_server_path, output_path, start_time, end_time, e142_format = readConfig()
 
     list_A = readFolder(A_server_path)
@@ -355,6 +356,7 @@ def main_work():
     i = 0
     for each_file_A in list_A:
         i += 1
+        lot_e142 = ''
         print('Processing file %d:' % i + each_file_A)
         each_file_B = ''
         columns = ['Type_B', 'Position', 'Property', 'Value_A', 'Value_B', 'Backup_A', 'Backup_B']
@@ -366,13 +368,17 @@ def main_work():
         try:
             file_type = get_type(each_file_A)
 
+            if file_type.lower() == 'xml':
+                e142_format = 4
+
+
             if file_type in each_file_A:
                 tmp = each_file_A.split('_')
                 lot = tmp[0]
+                sort = tmp[1]
 
                 if e142_format in ['4', 4]:
 
-                    sort = tmp[1]
                     if len(tmp) == 5:
                         sort += '_' + tmp[2]
                     file_start = lot + '_' + sort
@@ -381,7 +387,6 @@ def main_work():
 
                 elif e142_format in ['3', 3]:
 
-                    sort = tmp[1]
                     if len(tmp) == 4:
                         sort += '_' + tmp[2] + '_' + tmp[3]
                     file_start = lot + '_' + sort
@@ -389,6 +394,12 @@ def main_work():
                     #     file_start += '_' + tmp[3]
 
                 each_file_A = A_server_path.replace('\n', '') + '\\' + each_file_A
+
+                if file_type in ['e142']:
+                    try:
+                        lot_e142 = get_lot_e142(each_file_A)
+                    except Exception as e1:
+                        pass
 
                 # skip file out of (start,end)
                 create_time = os.path.getmtime(each_file_A)
@@ -433,12 +444,16 @@ def main_work():
                         break
 
                 if source_file_name_A != source_file_name_B:
-                    error += [each_file_A]
-                    continue
+                    if each_file_A:
+                        dic = {'File': each_file_A, 'lot': lot_e142}
+                        error += [dic]
+                        continue
 
                 if each_file_B == '':
-                    error += [each_file_A]
-                    continue
+                    if each_file_A:
+                        dic = {'File': each_file_A, 'lot': lot_e142}
+                        error += [dic]
+                        continue
 
                 if file_type != 'xml':
                     if each_file_A.split('\\')[-1] == each_file_B.split('\\')[-1]:
@@ -509,7 +524,6 @@ def main_work():
                     lambda row: deleted_tag(row, each_file_A) if ('delete' == row['Type']) else row['Value_A'], axis=1)
 
                 if file_type in ['e142']:
-                    lot_e142 = get_lot_e142(each_file_A)
                     df_each_file.insert(1, 'LotId', lot_e142)
 
                 if file_type != 'xml':
@@ -523,8 +537,8 @@ def main_work():
         except Exception as e:
             print(e, 'Error: %s' % each_file_A)
             if each_file_A:
-                error += [each_file_A]
-            # error += [each_file_A.split('\\')[-1]]
+                dic={'File':each_file_A,'lot':lot_e142}
+                error += [dic]
 
             continue
 

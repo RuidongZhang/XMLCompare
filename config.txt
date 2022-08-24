@@ -25,20 +25,21 @@
 # # End_time|2021-01-01
 # End_time|now
 
-A_server|D:\XMLCompare\ATBK\MAP\C
-B_server|D:\XMLCompare\ATBK\MAP\A
+A_server|D:\XMLCompare\ATKL\Instript_prodB_17082022
+B_server|D:\XMLCompare\ATKL\Instript_prodC_17082022
 # A_server|E:\XMLCompare\A server InkMap
 # B_server|E:\XMLCompare\B server InkMap
 
 Output|E:\XMLCompare\FT\result
 
-Start_time|2021-01-12
+Start_time|2022-08-15
 
 # End_time|2021-01-01
 End_time|now
 
 # xml format
 # LJ4AU4617557_FHA_Hold_20211228140136.xml
+# N0PB32GZ0000_4020_xh3_Quarantine_20220815224023.xml
 # e142 format
 # CV0628-01D6_CP1_PRB_20210302011416_20210302011854.e142 - e142_format|4  default
 # SVV239-01F7_W1_WH1_20220422102849.e142 - e142_format|3
