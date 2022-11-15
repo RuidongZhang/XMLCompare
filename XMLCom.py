@@ -370,7 +370,12 @@ def main_work():
 
             if file_type.lower() == 'xml':
                 e142_format = 4
-
+            elif e142_format in ['3', 3]:
+                if len(each_file_A.split('_')) == 5:
+                    e142_format = 4
+            elif e142_format in ['4', 4]:
+                if len(each_file_A.split('_')) == 4:
+                    e142_format = 3
 
             if file_type in each_file_A:
                 tmp = each_file_A.split('_')

@@ -18,7 +18,7 @@ def get_xml_root(file):
         # sys.exit(1)
     return root
 
-root = get_xml_root(file='test.xml')
+root = get_xml_root(file='testjian.xml')
 
 print(root.tag, "---", root.attrib)
 for child in root:

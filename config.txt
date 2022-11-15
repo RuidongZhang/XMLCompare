@@ -25,8 +25,8 @@
 # # End_time|2021-01-01
 # End_time|now
 
-A_server|D:\XMLCompare\ATKL\Instript_prodB_17082022
-B_server|D:\XMLCompare\ATKL\Instript_prodC_17082022
+A_server|\\nardc02nasp201.wbi.nxp.com\USPHX01OPLOADER-FS01\OptimalTestFiles\SequoiaWidgets\Ruidong\XML\A
+B_server|\\nardc02nasp201.wbi.nxp.com\USPHX01OPLOADER-FS01\OptimalTestFiles\SequoiaWidgets\Ruidong\XML\C
 # A_server|E:\XMLCompare\A server InkMap
 # B_server|E:\XMLCompare\B server InkMap
 
